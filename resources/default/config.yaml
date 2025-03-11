@@ -1,0 +1,10 @@
+provider: "ollama"  # Default provider ("ollama", "openai", etc.)
+
+model:
+  name: "phi4"         # Default model name
+  temperature: 0.8     # Sampling temperature (higher = more randomness)
+  streaming: true      # Enable streaming mode (for large inputs)
+
+client:
+  timeout: "2m"        # Request timeout (e.g., "30s", "2m", "5m")
+  verbose_logging: true # Enable verbose logging

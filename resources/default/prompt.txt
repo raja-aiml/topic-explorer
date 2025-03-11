@@ -1,0 +1,1 @@
+Human: What is your model name and capabilities?\nAssistant:", "Prompt for LLM

@@ -1,0 +1,25 @@
+template: |
+  I’m a {audience} learning about {topic} as a {learning_stage} learner.
+  
+  I find technical explanations overwhelming, so I’d like an analogy to help me understand it in a simple, relatable way.
+
+  Can you explain {topic} using a real-life scenario that a {context} would be familiar with, such as 
+  {analogies}? 
+
+  Please cover key concepts such as:
+  {concepts}
+
+  Explanation Requirements:
+  {explanation_requirements}
+
+  Formatting Guidelines:
+  {formatting}
+
+  Constraints:
+  {constraints}
+
+  Output Format:
+  {output_format}
+
+  The analogy should make it clear why {topic} is useful and how it helps with {purpose}. 
+  Please ensure the explanation is **{tone}**.
