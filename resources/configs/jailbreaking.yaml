@@ -1,0 +1,45 @@
+audience: "New college students"
+learning_stage: "first-time"
+topic: "LLM Jailbreaking"
+context: "student"
+analogies: "Road trip planning with friends and Writing a group project collaboration"
+
+concepts:
+  - "**AI Safety Rules**: The restrictions placed on LLMs to ensure responsible behavior"
+  - "**Jailbreaking**: Bypassing AI safety measures to make it generate restricted content"
+  - "**Prompt Injection**: A trick used to manipulate AI into revealing or generating unintended outputs"
+  - "**Role-Playing Exploit**: Convincing AI to behave differently by asking it to take on a persona"
+  - "**Token Smuggling**: Hiding restricted words inside a prompt to bypass filters"
+  - "**Recursive Prompting**: Asking AI indirect or step-by-step questions to get restricted information"
+  - "**Ethical AI Use**: Understanding LLM vulnerabilities to improve AI safety rather than exploit it"
+
+explanation_requirements:
+  - "Start with a brief overview comparing LLM safety to the chosen analogy"
+  - "Use concrete, relatable examples from the analogy to explain key LLM jailbreaking concepts"
+  - "Explain why AI safety measures exist and how they work to prevent misuse"
+  - "Include real-world scenarios where AI jailbreaking has led to ethical concerns"
+  - "Explain practical benefits—why students should care about AI security"
+
+formatting:
+  - "Use engaging section headers"
+  - "Include bullet points for clarity"
+  - "Use code blocks where applicable (for AI prompts and responses)"
+  - "Use bold text for key terms when first introduced"
+
+constraints:
+  - "Avoid technical jargon without explanation"
+  - "Don't assume prior knowledge of AI systems"
+  - "Keep paragraphs short and digestible"
+  - "Emphasize practical benefits over theoretical concepts"
+
+output_format:
+  - "Start with a catchy title"
+  - "Open with a relatable scenario that hooks student interest"
+  - "Develop multiple analogies that work together cohesively"
+  - "End with a summary of why AI security matters for future careers"
+  - "Consider including a 'quick reference' section at the end"
+  - "Recap the key concepts and their real-world implications"
+  - "Provide a clear call-to-action for students to learn about AI ethics and security"
+
+purpose: "Understanding AI vulnerabilities and ethical AI use"
+tone: "Engaging, friendly, and conversational"
