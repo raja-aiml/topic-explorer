@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 	"strings"
 	"sync"
 
@@ -100,22 +101,47 @@ func generatePrompt(templateStr string, configData config.Config) string {
 	return output
 }
 
-// getReplacements returns a map of placeholder replacements
+// getReplacements uses reflection to create a map of placeholder replacements
+// based on the YAML tags in the config.Config struct.
 func getReplacements(configData config.Config) map[string]string {
-	return map[string]string{
-		"{audience}":                 configData.Audience,
-		"{topic}":                    configData.Topic,
-		"{learning_stage}":           configData.LearningStage,
-		"{context}":                  configData.Context,
-		"{analogies}":                configData.Analogies,
-		"{concepts}":                 paths.FormatList(configData.Concepts),
-		"{explanation_requirements}": paths.FormatList(configData.ExplanationRequirements),
-		"{formatting}":               paths.FormatList(configData.Formatting),
-		"{constraints}":              paths.FormatList(configData.Constraints),
-		"{output_format}":            paths.FormatList(configData.OutputFormat),
-		"{purpose}":                  configData.Purpose,
-		"{tone}":                     configData.Tone,
+	replacements := make(map[string]string)
+	val := reflect.ValueOf(configData)
+	typ := reflect.TypeOf(configData)
+
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+		// Use the YAML tag if available; otherwise, default to the lowercased field name.
+		tag := field.Tag.Get("yaml")
+		if tag == "" {
+			tag = strings.ToLower(field.Name)
+		} else {
+			// In case the tag has additional options (e.g. "audience,omitempty"),
+			// split and take the first value.
+			tag = strings.Split(tag, ",")[0]
+		}
+
+		placeholder := "{" + tag + "}"
+		fieldValue := val.Field(i)
+		var strValue string
+
+		// If the field is a slice of strings, use paths.FormatList to format it.
+		if fieldValue.Kind() == reflect.Slice && fieldValue.Type().Elem().Kind() == reflect.String {
+			var items []string
+			for j := 0; j < fieldValue.Len(); j++ {
+				items = append(items, fieldValue.Index(j).String())
+			}
+			strValue = paths.FormatList(items)
+		} else if fieldValue.Kind() == reflect.String {
+			strValue = fieldValue.String()
+		} else {
+			// Fallback for other types: use the default string formatting.
+			strValue = fmt.Sprintf("%v", fieldValue.Interface())
+		}
+
+		replacements[placeholder] = strValue
 	}
+
+	return replacements
 }
 
 // savePrompt ensures directories exist and writes the output file
