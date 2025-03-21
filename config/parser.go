@@ -6,12 +6,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Template structure for YAML
+// Package-level variable for dependency injection.
+var readFile = os.ReadFile
+
+// Template structure for YAML.
 type Template struct {
 	Template string `yaml:"template"`
 }
 
-// Config structure for YAML
+// Config structure for YAML.
 type Config struct {
 	Audience                string   `yaml:"audience"`
 	LearningStage           string   `yaml:"learning_stage"`
@@ -27,32 +30,25 @@ type Config struct {
 	Tone                    string   `yaml:"tone"`
 }
 
-// ReadTemplate parses the template YAML file
-func ReadTemplate(filePath string) (Template, error) {
-	var template Template
-	data, err := os.ReadFile(filePath)
+// ReadYAML is a generic function that reads a YAML file into any type.
+func ReadYAML[T any](filePath string) (T, error) {
+	var result T
+	data, err := readFile(filePath)
 	if err != nil {
-		return template, err
+		return result, err
 	}
-
-	if err := yaml.Unmarshal(data, &template); err != nil {
-		return template, err
+	if err := yaml.Unmarshal(data, &result); err != nil {
+		return result, err
 	}
-
-	return template, nil
+	return result, nil
 }
 
-// ReadConfig parses the config YAML file
+// ReadTemplate parses the template YAML file using the generic parser.
+func ReadTemplate(filePath string) (Template, error) {
+	return ReadYAML[Template](filePath)
+}
+
+// ReadConfig parses the config YAML file using the generic parser.
 func ReadConfig(filePath string) (Config, error) {
-	var config Config
-	data, err := os.ReadFile(filePath)
-	if err != nil {
-		return config, err
-	}
-
-	if err := yaml.Unmarshal(data, &config); err != nil {
-		return config, err
-	}
-
-	return config, nil
+	return ReadYAML[Config](filePath)
 }
