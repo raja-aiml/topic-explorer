@@ -8,7 +8,7 @@ import (
 	"github.com/tmc/langchaingo/llms/openai"
 )
 
-// initLLMProvider initializes the LLM provider based on configuration
+// initLLMProvider initializes the LLM provider based on configuration.
 func initLLMProvider(config Config) (llms.Model, error) {
 	switch config.Provider {
 	case "ollama":

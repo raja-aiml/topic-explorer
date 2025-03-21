@@ -17,31 +17,34 @@ const (
 	DefaultVerboseLogging = true
 )
 
-// ModelConfig holds configuration specific to the language model
+// ModelConfig holds configuration specific to the language model.
 type ModelConfig struct {
 	Name        string  // Name of the model
 	Temperature float64 // Temperature setting
 }
 
-// ClientConfig holds runtime behavior configuration
+// ClientConfig holds runtime behavior configuration.
 type ClientConfig struct {
 	Timeout        time.Duration // Maximum request time
 	VerboseLogging bool          // Enable verbose logs
 }
 
-// Config aggregates model and client configurations
+// Config aggregates model and client configurations.
 type Config struct {
 	Provider string
 	Model    ModelConfig
 	Client   ClientConfig
 }
 
-// ConfigLoader loads LLM configuration from a YAML file
+// Dependency injection: package-level variable for file reading.
+var readFile = os.ReadFile
+
+// ConfigLoader loads LLM configuration from a YAML file.
 func ConfigLoader(filePath string) (Config, error) {
 	config := Config{}
 
 	// Read YAML file
-	data, err := os.ReadFile(filePath)
+	data, err := readFile(filePath)
 	if err != nil {
 		return config, fmt.Errorf("failed to read config file: %w", err)
 	}
