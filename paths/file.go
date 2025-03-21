@@ -7,15 +7,19 @@ import (
 	"strings"
 )
 
-// EnsureDirectoryExists checks if a directory exists and creates it if necessary
+// Declare package-level variables for dependency injection.
+var mkdirAll = os.MkdirAll
+var fatalf = log.Fatalf
+
+// EnsureDirectoryExists checks if a directory exists and creates it if necessary.
 func EnsureDirectoryExists(filePath string) {
 	dir := filepath.Dir(filePath)
-	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
-		log.Fatalf("Error creating directory %s: %v", dir, err)
+	if err := mkdirAll(dir, os.ModePerm); err != nil {
+		fatalf("Error creating directory %s: %v", dir, err)
 	}
 }
 
-// FormatList converts a slice of strings into a formatted list
+// FormatList converts a slice of strings into a formatted list.
 func FormatList(items []string) string {
 	if len(items) == 0 {
 		return ""
