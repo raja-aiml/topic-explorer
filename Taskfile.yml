@@ -11,6 +11,5 @@ tasks:
   coverage:
     desc: "Run tests with coverage and generate an HTML report"
     cmds:
-      - go test ./... -cover
       - go test ./... -coverprofile=.build/coverage.out
       - go tool cover -html=.build/coverage.out -o .build/coverage.html
