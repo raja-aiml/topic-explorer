@@ -10,7 +10,7 @@ import (
 	"raja.aiml/topic.explorer/paths"
 )
 
-// getPrompt reads the prompt from a file
+// getPrompt reads the prompt from a file and returns its content as a string.
 func getPrompt(path string) (string, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
@@ -19,28 +19,37 @@ func getPrompt(path string) (string, error) {
 	return string(content), nil
 }
 
-// saveResponse writes response to a file
+// saveResponse writes the LLM response to the specified file.
 func saveResponse(response, path string) error {
 	return os.WriteFile(path, []byte(response), 0644)
 }
 
-// runLLMInteraction executes the LLM call
+// runLLMInteraction initializes the LLM client and returns the response for the given prompt.
 func runLLMInteraction(prompt string) (string, error) {
 	cfg := llm.Config{
 		Provider: providerName,
-		Model:    llm.ModelConfig{Name: modelName, Temperature: temperature},
-		Client:   llm.ClientConfig{Timeout: timeout, VerboseLogging: true},
+		Model: llm.ModelConfig{
+			Name:        modelName,
+			Temperature: temperature,
+		},
+		Client: llm.ClientConfig{
+			Timeout:        timeout,
+			VerboseLogging: true,
+		},
 	}
-	client, err := llm.NewClient(cfg)
+
+	client, err := llm.NewDefaultClient(cfg)
 	if err != nil {
 		return "", fmt.Errorf("failed to create LLM client: %w", err)
 	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
+
 	return client.Chat(ctx, prompt)
 }
 
-// resolvePaths sets common paths
+// resolvePaths fills in default or derived paths based on the topic and other flags.
 func resolvePaths() {
 	topic = strings.ToLower(topic)
 	configPath = paths.GetConfigPath(topic, configPath)
