@@ -10,18 +10,21 @@ import (
 )
 
 type LLMRunner struct {
-	Out io.Writer
+	Out          io.Writer
+	GetPrompt    func(promptPath string) (string, error)
+	RunLLM       func(prompt string) (string, error)
+	SaveResponse func(response, path string) error
 }
 
 func (r *LLMRunner) Run() {
 	fmt.Fprintln(r.Out, "Reading prompt...")
-	text, err := getPrompt(promptPath)
+	text, err := r.GetPrompt(promptPath)
 	if err != nil {
 		log.Fatalf("Prompt error: %v", err)
 	}
 
 	fmt.Fprintln(r.Out, "Calling LLM...")
-	resp, err := runLLMInteraction(text)
+	resp, err := r.RunLLM(text)
 	if err != nil {
 		log.Fatalf("LLM error: %v", err)
 	}
@@ -30,7 +33,7 @@ func (r *LLMRunner) Run() {
 
 	if responseFilePath != "" {
 		fmt.Fprintf(r.Out, "Saving to: %s\n", responseFilePath)
-		if err := saveResponse(resp, responseFilePath); err != nil {
+		if err := r.SaveResponse(resp, responseFilePath); err != nil {
 			log.Fatalf("Save error: %v", err)
 		}
 	}
@@ -40,7 +43,13 @@ var llmCmd = &cobra.Command{
 	Use:   "llm",
 	Short: "Send a raw prompt to LLM",
 	Run: func(cmd *cobra.Command, args []string) {
-		(&LLMRunner{Out: os.Stdout}).Run()
+		runner := &LLMRunner{
+			Out:          os.Stdout,
+			GetPrompt:    getPrompt,
+			RunLLM:       runLLMInteraction,
+			SaveResponse: saveResponse,
+		}
+		runner.Run()
 	},
 }
 
