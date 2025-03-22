@@ -2,6 +2,7 @@ package llm
 
 import (
 	"fmt"
+	"os"
 	"testing"
 )
 
@@ -24,6 +25,8 @@ func TestInitLLMProvider_Ollama(t *testing.T) {
 
 func TestInitLLMProvider_OpenAI(t *testing.T) {
 	// Test the "openai" branch.
+	os.Setenv("OPENAI_API_KEY", "dummy-key")
+	defer os.Unsetenv("OPENAI_API_KEY")
 	cfg := Config{
 		Provider: "openai",
 		Model: ModelConfig{
