@@ -10,27 +10,24 @@ import (
 	"github.com/tmc/langchaingo/llms"
 )
 
-// MockModel is a Testify mock that implements the llms.Model interface.
+// ------------------------
+// Mock Model Implementation
+// ------------------------
+
 type MockModel struct {
 	mock.Mock
 }
 
-// Call is a mock implementation of the Call method.
-// It flattens the variadic opts so that expectations can be set easily.
 func (m *MockModel) Call(ctx context.Context, prompt string, opts ...llms.CallOption) (string, error) {
 	allArgs := []interface{}{ctx, prompt}
 	for _, opt := range opts {
 		allArgs = append(allArgs, opt)
 	}
-	// Dump the arguments for debugging.
 	spew.Dump("MockModel.Call invoked with:", allArgs)
 	args := m.Called(allArgs...)
 	return args.String(0), args.Error(1)
 }
 
-// GenerateContent is a mock implementation of the GenerateContent method.
-// Although it is not used in this test (because we override generateFromSinglePrompt),
-// it must be implemented to satisfy the interface.
 func (m *MockModel) GenerateContent(ctx context.Context, messages []llms.MessageContent, opts ...llms.CallOption) (*llms.ContentResponse, error) {
 	allArgs := []interface{}{ctx, messages}
 	for _, opt := range opts {
@@ -41,27 +38,38 @@ func (m *MockModel) GenerateContent(ctx context.Context, messages []llms.Message
 	return args.Get(0).(*llms.ContentResponse), args.Error(1)
 }
 
-func TestChat(t *testing.T) {
-	mockModel := new(MockModel)
-	// Expect exactly four arguments: context, "test prompt", and two call options.
-	mockModel.
-		On("Call", mock.Anything, "test prompt", mock.Anything, mock.Anything).
-		Return("mocked response", nil)
+// ------------------------
+// Helper Functions
+// ------------------------
 
-	// Override generateFromSinglePrompt so that it calls model.Call.
-	origGenerate := generateFromSinglePrompt
+func setupMockModel() *MockModel {
+	mockModel := new(MockModel)
+	mockModel.On("Call", mock.Anything, "test prompt", mock.Anything, mock.Anything).
+		Return("mocked response", nil)
+	return mockModel
+}
+
+func overrideGenerateFromSinglePrompt() func() {
+	original := generateFromSinglePrompt
 	generateFromSinglePrompt = func(ctx context.Context, model llms.Model, prompt string, opts ...llms.CallOption) (string, error) {
 		return model.Call(ctx, prompt, opts...)
 	}
-	defer func() { generateFromSinglePrompt = origGenerate }()
+	return func() {
+		generateFromSinglePrompt = original
+	}
+}
 
-	// Override initProvider to return our mock.
-	origInitProvider := initProvider
+func overrideInitProvider(mockModel *MockModel) func() {
+	original := initProvider
 	initProvider = func(cfg Config) (llms.Model, error) {
 		return mockModel, nil
 	}
-	defer func() { initProvider = origInitProvider }()
+	return func() {
+		initProvider = original
+	}
+}
 
+func createTestClient(t *testing.T) *Client {
 	client, err := NewClient(Config{
 		Provider: "dummy",
 		Model: ModelConfig{
@@ -76,6 +84,21 @@ func TestChat(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create client: %v", err)
 	}
+	return client
+}
+
+// ------------------------
+// Main Test Function
+// ------------------------
+
+func TestChat(t *testing.T) {
+	mockModel := setupMockModel()
+	restoreGenerate := overrideGenerateFromSinglePrompt()
+	defer restoreGenerate()
+	restoreProvider := overrideInitProvider(mockModel)
+	defer restoreProvider()
+
+	client := createTestClient(t)
 
 	response, err := client.Chat(context.Background(), "test prompt")
 	if err != nil {
@@ -84,5 +107,6 @@ func TestChat(t *testing.T) {
 	if response != "mocked response" {
 		t.Fatalf("Expected response to be 'mocked response', but got '%s'", response)
 	}
+
 	mockModel.AssertExpectations(t)
 }
