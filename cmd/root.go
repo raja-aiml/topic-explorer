@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -8,20 +9,16 @@ import (
 
 // rootCmd is the main CLI command
 var rootCmd = &cobra.Command{
-	Use:   "topic-explorer",
-	Short: "Generate a structured prompt from YAML templates",
+	Use:           "topic-explorer",
+	Short:         "Generate a structured prompt from YAML templates and interact with LLMs",
+	SilenceUsage:  true,
+	SilenceErrors: true,
 }
 
-// Execute runs the root command
+// Execute runs the CLI application
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
-}
-
-// Init function to register all subcommands
-func init() {
-	// Add all subcommands here
-	rootCmd.AddCommand(llmCmd)    // Registers LLM command
-	rootCmd.AddCommand(promptCmd) // Registers Prompt command
 }

@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"fmt"
+	"io"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -8,38 +11,48 @@ import (
 	"raja.aiml/topic.explorer/prompt"
 )
 
+type PromptRunner struct {
+	Out         io.Writer
+	BuildPrompt func(templatePath, configPath, outputPath string) string
+}
+
+func (r *PromptRunner) Run() {
+	topic = strings.ToLower(topic)
+
+	configPath = paths.GetConfigPath(topic, configPath)
+	templatePath = paths.GetTemplatePath(templatePath)
+	outputPath = paths.GetOutputPath(topic, outputPath)
+
+	generatedPath := r.BuildPrompt(templatePath, configPath, outputPath)
+
+	fmt.Fprintf(r.Out, "Prompt generated and saved to: %s\n", generatedPath)
+}
+
 // promptCmd represents the prompt generation command
 var promptCmd = &cobra.Command{
 	Use:   "prompt",
 	Short: "Generate a structured prompt from YAML templates",
 	Run: func(cmd *cobra.Command, args []string) {
-		topic = strings.ToLower(topic)
-
-		// Get paths from path manager
-		configPath = paths.GetConfigPath(topic, configPath)
-		outputPath = paths.GetOutputPath(topic, outputPath)
-		templatePath = paths.GetTemplatePath(templatePath)
-
-		// Generate prompt
-		buildPrompt(templatePath, configPath, outputPath)
+		runner := &PromptRunner{
+			Out:         os.Stdout,
+			BuildPrompt: buildPrompt,
+		}
+		runner.Run()
 	},
 }
 
-// Init function to add promptCmd to root
 func init() {
-	// Define CLI flags
 	promptCmd.Flags().StringVarP(&topic, "topic", "", "", "Topic name (required)")
 	promptCmd.Flags().StringVarP(&templatePath, "template", "t", "", "Path to template file (default: resources/template.yaml)")
 	promptCmd.Flags().StringVarP(&configPath, "config", "c", "", "Path to config file (default: based on topic)")
 	promptCmd.Flags().StringVarP(&outputPath, "output", "o", "", "Path to save generated prompt (default: based on topic)")
 
 	promptCmd.MarkFlagRequired("topic")
-
+	rootCmd.AddCommand(promptCmd)
 }
 
-// Builds the prompt and returns the path to the generated prompt
+// buildPrompt generates the prompt and returns the output file path
 func buildPrompt(templatePath, configPath, outputPath string) string {
-	// Generate prompt
 	prompt.Build(templatePath, configPath, outputPath)
 	return outputPath
 }
