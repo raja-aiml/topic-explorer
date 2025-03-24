@@ -1,7 +1,7 @@
-# 🧭 Topic Explorer  
+# 🧭 AI Explorer  
 
 ## Overview  
-**Topic Explorer** is a command-line tool that generates structured prompts from YAML templates and interacts with Large Language Models (LLMs) like OpenAI's GPT and Ollama-based models. It helps users create detailed prompts for AI interactions, retrieve model responses, and save them for further analysis.  
+**AI Explorer** is a command-line tool that generates structured prompts from YAML templates and interacts with Large Language Models (LLMs) like OpenAI's GPT and Ollama-based models. It helps users create detailed prompts for AI interactions, retrieve model responses, and save them for further analysis.  
 
 ---
 
@@ -26,7 +26,7 @@ Ensure you have the following installed:
 ### Clone the Repository  
 ```sh  
 git clone https://github.com/yourusername/topic-explorer.git  
-cd topic-explorer  
+cd ai-explorer  
 ```
 
 ### Install Dependencies  
@@ -36,7 +36,7 @@ go mod tidy
 
 ### Build the Project  
 ```sh  
-go build -o topic-explorer  
+go build -o ai-explorer  
 ```
 
 ---
@@ -45,17 +45,17 @@ go build -o topic-explorer
 
 ### Generate a Prompt  
 ```sh  
-./topic-explorer prompt --topic git --template resources/template.yaml --config resources/configs/git.yaml --output resources/output/git/prompt.txt  
+./ai-explorer prompt --topic git --template resources/template.yaml --config resources/configs/git.yaml --output resources/output/git/prompt.txt  
 ```
 
 ### Interact with LLM  
 ```sh  
-./topic-explorer llm --provider openai --model gpt-4 --prompt resources/output/git/prompt.txt --temperature 0.8  
+./ai-explorer llm --provider openai --model gpt-4 --prompt resources/output/git/prompt.txt --temperature 0.8  
 ```
 
 ### Generate & Retrieve a Response in One Step  
 ```sh  
-./topic-explorer chat --topic git --provider openai --model gpt-4o  
+./ai-explorer chat --topic git --provider openai --model gpt-4o  
 ```
 
 ---
@@ -90,7 +90,7 @@ context: "Software Engineering"  \analogies: "Shipping containers and package ma
 
 ## 📂 File Structure  
 ```plaintext  
-topic-explorer  
+ai-explorer  
 ├── cmd/                # CLI Commands  
 │   ├── llm.go          # Handles LLM interactions  
 │   ├── chat.go         # Handles automated prompt generation + response  
@@ -130,9 +130,9 @@ topic-explorer
 
 ### OpenAI Usage  
 ```sh  
-./topic-explorer llm --provider openai --model gpt-4o  
+./ai-explorer llm --provider openai --model gpt-4o  
 ```
 
 ### Ollama (Local Inference)  
 ```sh  
-./topic-explorer llm --provider ollama --model phi4  
+./ai-explorer llm --provider ollama --model phi4  

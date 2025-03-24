@@ -8,8 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"raja.aiml/topic.explorer/config"
-	"raja.aiml/topic.explorer/paths"
+	"raja.aiml/ai.explorer/config"
+	"raja.aiml/ai.explorer/paths"
 )
 
 // ProcessFiles orchestrates reading, processing, and writing prompt files

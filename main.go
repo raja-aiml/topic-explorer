@@ -1,7 +1,7 @@
 package main
 
 import (
-	"raja.aiml/topic.explorer/cmd"
+	"raja.aiml/ai.explorer/cmd"
 )
 
 func main() {

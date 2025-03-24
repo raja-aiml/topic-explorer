@@ -9,8 +9,8 @@ import (
 	"sync"
 	"testing"
 
-	"raja.aiml/topic.explorer/config"
-	"raja.aiml/topic.explorer/paths"
+	"raja.aiml/ai.explorer/config"
+	"raja.aiml/ai.explorer/paths"
 )
 
 // TestGeneratePrompt verifies that generatePrompt correctly replaces placeholders.

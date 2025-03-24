@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"raja.aiml/topic.explorer/prompt"
+	"raja.aiml/ai.explorer/prompt"
 )
 
 type PromptRunner struct {

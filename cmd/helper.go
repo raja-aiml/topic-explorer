@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"raja.aiml/topic.explorer/llm"
-	"raja.aiml/topic.explorer/paths"
+	"raja.aiml/ai.explorer/llm"
+	"raja.aiml/ai.explorer/paths"
 )
 
 // getPrompt reads the prompt from a file and returns its content as a string.

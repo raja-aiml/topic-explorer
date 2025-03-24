@@ -11,7 +11,6 @@ import (
 )
 
 // --- Supportable for testable os.Exit() mocking ---
-var osExit = os.Exit
 
 func TestExecuteSuccess(t *testing.T) {
 	oldArgs := os.Args
