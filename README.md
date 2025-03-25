@@ -45,7 +45,7 @@ go build -o ai-explorer
 
 ### Generate a Prompt  
 ```sh  
-./ai-explorer prompt --topic git --template resources/template.yaml --config resources/configs/git.yaml --output resources/output/git/prompt.txt  
+./ai-explorer prompt --topic git --template resources/templates/topic.yaml --config resources/configs/git.yaml --output resources/output/git/prompt.txt  
 ```
 
 ### Interact with LLM  
@@ -84,39 +84,6 @@ audience: "Developers"
 learning_stage: "Intermediate"  
 topic: "Docker"  
 context: "Software Engineering"  \analogies: "Shipping containers and package management"  
-```
-
----
-
-## 📂 File Structure  
-```plaintext  
-ai-explorer  
-├── cmd/                # CLI Commands  
-│   ├── llm.go          # Handles LLM interactions  
-│   ├── chat.go         # Handles automated prompt generation + response  
-│   ├── prompt.go       # Handles prompt generation from YAML templates  
-│   ├── root.go         # CLI entry point  
-│   └── vars.go         # Default values and constants  
-├── llm/                # LLM Handling  
-│   ├── provider.go     # Manages OpenAI & Ollama providers  
-│   ├── handler.go      # Handles streaming and request flow  
-│   ├── config.go       # Parses LLM configurations  
-│   ├── client.go       # LLM API client implementation  
-├── config/             # Configuration Parsing  
-│   └── parser.go       # Parses YAML files  
-├── paths/              # File Path Management  
-│   ├── file.go         # File operations  
-│   ├── manager.go      # Path resolution for templates, outputs, and configs  
-├── resources/          # Prompt Templates & Output  
-│   ├── template.yaml   # Main prompt template  
-│   ├── configs/        # Topic-specific configurations  
-│   ├── output/         # Generated prompts & responses  
-│   └── default/        # Default configurations  
-├── prompt/             # Prompt Generation Logic  
-│   └── build.go        # Asynchronous processing for prompt building  
-├── main.go             # Entry point for execution  
-├── go.mod              # Go module dependencies  
-├── go.sum              # Dependency checksums  
 ```
 
 ---

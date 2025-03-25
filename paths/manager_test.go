@@ -57,7 +57,7 @@ func TestGetAnswerPath_Default(t *testing.T) {
 }
 
 func TestGetTemplatePath_Custom(t *testing.T) {
-	custom := "/custom/template.yaml"
+	custom := "/custom/topic.yaml"
 	result := GetTemplatePath(custom)
 	if result != custom {
 		t.Errorf("Expected custom template path %q, got %q", custom, result)

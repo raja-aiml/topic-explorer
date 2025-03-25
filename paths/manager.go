@@ -4,11 +4,11 @@ import "fmt"
 
 // Default paths
 const (
-	BasePath         = "resources"
+	BasePath         = "resources/templates"
 	ConfigPathFormat = BasePath + "/configs/%s.yaml"
 	OutputPathFormat = BasePath + "/output/%s/prompt.txt"
 	AnswerPathFormat = BasePath + "/output/%s/answer.md"
-	TemplateFilePath = BasePath + "/template.yaml"
+	TemplateFilePath = BasePath + "/topic.yaml"
 )
 
 // GetConfigPath returns the config file path for a given topic

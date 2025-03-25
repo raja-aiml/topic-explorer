@@ -10,8 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// --- Test ---
-
 func TestPromptRunnerRun(t *testing.T) {
 	// Arrange
 	tmpDir := t.TempDir()
@@ -20,16 +18,37 @@ func TestPromptRunnerRun(t *testing.T) {
 	configPath = filepath.Join(tmpDir, "config.yaml")
 	outputPath = filepath.Join(tmpDir, "generated.txt")
 
-	// Create dummy template/config files
-	writeFile(t, templatePath, "template: mock")
-	writeFile(t, configPath, "config: mock")
+	// Create a dummy template file with valid YAML structure.
+	// This file will be parsed into a prompt.Template struct.
+	dummyTemplate := `template: |
+  Hello, {{ audience }}! You are learning about {{ topic }}.`
+	writeFile(t, templatePath, dummyTemplate)
+
+	// Create a dummy config file with valid fields.
+	dummyConfig := `
+audience: "Test Audience"
+learning_stage: "beginner"
+topic: "Test Topic"
+context: "Test Context"
+analogies: "Test Analogies"
+concepts:
+  - "Test Concept"
+explanation_requirements:
+  - "Test Requirement"
+formatting:
+  - "Test Formatting"
+constraints:
+  - "Test Constraint"
+output_format:
+  - "Test Output"
+purpose: "Test Purpose"
+tone: "Test Tone"
+`
+	writeFile(t, configPath, dummyConfig)
 
 	// Capture output
 	var out bytes.Buffer
 	runner := &PromptRunner{Out: &out}
-
-	// Override buildPrompt (optional – here we use the real one)
-	// This depends on prompt.Build just writing the file
 
 	// Act
 	runner.Run()
@@ -38,14 +57,13 @@ func TestPromptRunnerRun(t *testing.T) {
 	output := out.String()
 	assert.Contains(t, output, "Prompt saved to: "+outputPath)
 
-	// Validate prompt file is created
+	// Validate that the generated prompt file contains the expected rendered output.
 	data, err := os.ReadFile(outputPath)
 	require.NoError(t, err)
-	assert.NotEmpty(t, data) // Should contain something written by prompt.Build
+	assert.Contains(t, string(data), "Hello, Test Audience! You are learning about Test Topic.")
 }
 
-// --- Helpers ---
-
+// Helper: writeFile creates a temporary file with the given content.
 func writeFile(t *testing.T, path, content string) {
 	t.Helper()
 	err := os.WriteFile(path, []byte(content), 0644)

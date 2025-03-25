@@ -38,7 +38,7 @@ func newTestPaths(topic, suffix string) *TestPaths {
 	return &TestPaths{
 		RootDir:      rootDir,
 		BinPath:      filepath.Join(".build", binaryName),
-		TemplatePath: filepath.Join("resources", "template.yaml"),
+		TemplatePath: filepath.Join("resources", "templates/topic.yaml"),
 		ConfigPath:   filepath.Join("resources", "configs", topic+".yaml"),
 		OutputDir:    output,
 		PromptOutput: filepath.Join(output, "prompt.txt"),
