@@ -65,6 +65,8 @@ func detectPromptType(configPath string) string {
 	}
 
 	switch {
+	case hasKey(raw, "planning_phase") && hasKey(raw, "execution_phase"):
+		return "chart"
 	case hasKey(raw, "audience"):
 		return "topic"
 	default:
