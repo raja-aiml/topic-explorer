@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
 
@@ -15,6 +16,7 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
+	godotenv.Load()
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintf(rootCmd.ErrOrStderr(), "Error: %v\n", err)
 		os.Exit(1)
