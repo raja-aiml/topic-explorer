@@ -15,7 +15,8 @@ tasks:
     desc: "Run only unit tests (excluding e2e)"
     cmds:
       - |
-        go test $(go list ./... | grep -v '/e2e$')
+        go test -count=1  $(go list ./... | grep -v '/e2e$')
+
 
   e2e:
     desc: "Build and run Ginkgo-based end-to-end tests"

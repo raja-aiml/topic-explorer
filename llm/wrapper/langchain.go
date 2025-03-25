@@ -11,8 +11,10 @@ import (
 )
 
 type (
-	Model      = llms.Model
-	CallOption = llms.CallOption
+	Model           = llms.Model
+	CallOption      = llms.CallOption
+	MessageContent  = llms.MessageContent
+	ContentResponse = llms.ContentResponse
 )
 
 // ---------- LLM Provider Abstraction ----------
@@ -44,13 +46,13 @@ type Embedder interface {
 	Embed(ctx context.Context, inputs []string) ([][]float32, error)
 }
 
-// embedderImpl wraps langchaingo's embeddings.Embedder.
-type embedderImpl struct {
-	base embeddings.Embedder
+// Exported EmbedderImpl (previously embedderImpl)
+type EmbedderImpl struct {
+	Base embeddings.Embedder // Exported field
 }
 
 // NewOpenAIEmbedder creates an OpenAI-based Embedder (API key from env).
-func NewOpenAIEmbedder() (Embedder, error) {
+func NewOpenAIEmbedder() (*EmbedderImpl, error) {
 	llm, err := openai.New()
 	if err != nil {
 		return nil, err
@@ -59,12 +61,16 @@ func NewOpenAIEmbedder() (Embedder, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &embedderImpl{base: base}, nil
+	return &EmbedderImpl{Base: base}, nil
 }
 
 // Embed returns the embeddings for the provided inputs.
-func (e *embedderImpl) Embed(ctx context.Context, inputs []string) ([][]float32, error) {
-	return e.base.EmbedDocuments(ctx, inputs)
+func (e *EmbedderImpl) Embed(ctx context.Context, inputs []string) ([][]float32, error) {
+	return e.Base.EmbedDocuments(ctx, inputs)
+}
+
+func NewEmbedderFromBase(e embeddings.Embedder) *EmbedderImpl {
+	return &EmbedderImpl{Base: e}
 }
 
 // ---------- LLM Generation Helpers ----------
