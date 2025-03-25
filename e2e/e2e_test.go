@@ -11,11 +11,13 @@ import (
 
 // --- Configurable Constants ---
 const (
-	binaryName  = "ai-explorer"
-	topic       = "git"
-	model       = "gpt-4o"
-	provider    = "openai"
-	temperature = "0.7"
+	binaryName      = "ai-explorer"
+	topic           = "git"
+	openai_model    = "gpt-4o"
+	ollama_model    = "phi4"
+	openai_provider = "openai"
+	ollama_provider = "ollama"
+	temperature     = "0.7"
 )
 
 // --- Paths Struct ---
@@ -80,8 +82,8 @@ var _ = Describe("AI Explorer CLI (E2E)", func() {
 			It("Then it should return a valid model response", func() {
 				output, err := runCommand(paths,
 					"llm",
-					"--provider", provider,
-					"--model", model,
+					"--provider", openai_provider,
+					"--model", openai_model,
 					"--prompt", paths.PromptOutput,
 					"--temperature", temperature,
 				)
@@ -96,8 +98,36 @@ var _ = Describe("AI Explorer CLI (E2E)", func() {
 				output, err := runCommand(paths,
 					"chat",
 					"--topic", topic,
-					"--provider", provider,
-					"--model", model,
+					"--provider", ollama_provider,
+					"--model", ollama_model,
+				)
+
+				Expect(err).ToNot(HaveOccurred(), "Chat command failed:\n%s", string(output))
+				Expect(string(output)).To(ContainSubstring(topic))
+			})
+		})
+
+		When("the user runs the 'chat' command", func() {
+			It("Then it should generate a prompt and get a response in one step", func() {
+				output, err := runCommand(paths,
+					"chat",
+					"--topic", topic,
+					"--provider", openai_provider,
+					"--model", openai_model,
+				)
+
+				Expect(err).ToNot(HaveOccurred(), "Chat command failed:\n%s", string(output))
+				Expect(string(output)).To(ContainSubstring(topic))
+			})
+		})
+
+		When("the user runs the 'chat' command", func() {
+			It("Then it should generate a prompt and get a response in one step", func() {
+				output, err := runCommand(paths,
+					"chat",
+					"--topic", topic,
+					"--provider", ollama_provider,
+					"--model", ollama_model,
 				)
 
 				Expect(err).ToNot(HaveOccurred(), "Chat command failed:\n%s", string(output))
