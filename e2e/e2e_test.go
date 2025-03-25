@@ -39,7 +39,7 @@ func newTestPaths(topic string) *TestPaths {
 		TemplatePath: filepath.Join("resources", "template.yaml"),
 		ConfigPath:   filepath.Join("resources", "configs", topic+".yaml"),
 		OutputDir:    output,
-		PromptOutput: filepath.Join(output, "prompt.txt"),
+		PromptOutput: filepath.Join(root, output, "prompt.txt"),
 	}
 }
 
@@ -93,7 +93,6 @@ var _ = Describe("AI Explorer CLI (E2E)", func() {
 
 		When("the user runs the 'chat' command", func() {
 			It("Then it should generate a prompt and get a response in one step", func() {
-				Skip("skip calling llm")
 				output, err := runCommand(paths,
 					"chat",
 					"--topic", topic,
