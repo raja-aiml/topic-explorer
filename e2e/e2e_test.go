@@ -56,12 +56,6 @@ func runCommand(paths *TestPaths, args ...string) ([]byte, error) {
 	return output, err
 }
 
-func createOutputDir(paths *TestPaths) {
-	err := os.MkdirAll(paths.OutputDir, os.ModePerm)
-	GinkgoWriter.Printf("Created Direcrtory:\n%s\n", string(paths.OutputDir))
-	Expect(err).ToNot(HaveOccurred(), "Failed to create output directory")
-}
-
 func generatePrompt(paths *TestPaths) {
 	output, err := runCommand(paths,
 		"prompt",
@@ -115,7 +109,6 @@ var _ = Describe("AI Explorer CLI (E2E)", func() {
 	Describe("Prompt Generation", func() {
 		It("Should generate a prompt file", func() {
 			paths := newTestPaths(topic, "prompt")
-			createOutputDir(paths)
 			generatePrompt(paths)
 		})
 	})
@@ -123,14 +116,12 @@ var _ = Describe("AI Explorer CLI (E2E)", func() {
 	Describe("LLM Commands", func() {
 		It("Should return a valid OpenAI model response", func() {
 			paths := newTestPaths(topic, "openai_llm")
-			createOutputDir(paths)
 			generatePrompt(paths)
 			runLLMCommand(paths, openaiProvider, openaiModel)
 		})
 
 		It("Should return a valid Ollama model response", func() {
 			paths := newTestPaths(topic, "ollama_llm")
-			createOutputDir(paths)
 			generatePrompt(paths)
 			runLLMCommand(paths, ollamaProvider, ollamaModel)
 		})
@@ -139,13 +130,11 @@ var _ = Describe("AI Explorer CLI (E2E)", func() {
 	Describe("Chat Commands", func() {
 		It("Should generate a prompt and get an OpenAI response", func() {
 			paths := newTestPaths(topic, "openai_chat")
-			createOutputDir(paths)
 			runChatCommand(paths, openaiProvider, openaiModel)
 		})
 
 		It("Should generate a prompt and get an Ollama response", func() {
 			paths := newTestPaths(topic, "ollama_chat")
-			createOutputDir(paths)
 			runChatCommand(paths, ollamaProvider, ollamaModel)
 		})
 	})
