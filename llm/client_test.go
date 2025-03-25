@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/tmc/langchaingo/llms"
+	llmConfig "raja.aiml/ai.explorer/config/llm"
 )
 
 // MockModel mocks the llms.Model interface.
@@ -29,7 +30,7 @@ func TestClient_Chat_Success(t *testing.T) {
 	mockModel := new(MockModel)
 	mockModel.On("Call", mock.Anything, "hello", mock.Anything).Return("mocked reply", nil)
 
-	mockProvider := func(_ Config) (llms.Model, error) {
+	mockProvider := func(_ llmConfig.Config) (llms.Model, error) {
 		return mockModel, nil
 	}
 
@@ -37,12 +38,12 @@ func TestClient_Chat_Success(t *testing.T) {
 		return model.Call(ctx, prompt, opts...)
 	}
 
-	cfg := Config{
-		Model: ModelConfig{
+	cfg := llmConfig.Config{
+		Model: llmConfig.ModelConfig{
 			Name:        "test",
 			Temperature: 0.9,
 		},
-		Client: ClientConfig{
+		Client: llmConfig.ClientConfig{
 			Timeout:        time.Second,
 			VerboseLogging: false,
 		},

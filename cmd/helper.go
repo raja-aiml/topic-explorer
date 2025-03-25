@@ -8,6 +8,8 @@ import (
 
 	"raja.aiml/ai.explorer/llm"
 	"raja.aiml/ai.explorer/paths"
+
+	llmConfig "raja.aiml/ai.explorer/config/llm"
 )
 
 // getPrompt reads the prompt from a file and returns its content as a string.
@@ -26,13 +28,13 @@ func saveResponse(response, path string) error {
 
 // runLLMInteraction initializes the LLM client and returns the response for the given prompt.
 func runLLMInteraction(prompt string) (string, error) {
-	cfg := llm.Config{
+	cfg := llmConfig.Config{
 		Provider: providerName,
-		Model: llm.ModelConfig{
+		Model: llmConfig.ModelConfig{
 			Name:        modelName,
 			Temperature: temperature,
 		},
-		Client: llm.ClientConfig{
+		Client: llmConfig.ClientConfig{
 			Timeout:        timeout,
 			VerboseLogging: true,
 		},

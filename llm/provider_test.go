@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"os"
 	"testing"
+
+	llmConfig "raja.aiml/ai.explorer/config/llm"
 )
 
 func TestInitLLMProvider_Ollama(t *testing.T) {
 	// Test the "ollama" branch.
-	cfg := Config{
+	cfg := llmConfig.Config{
 		Provider: "ollama",
-		Model: ModelConfig{
+		Model: llmConfig.ModelConfig{
 			Name: "phi4",
 		},
 	}
@@ -27,9 +29,9 @@ func TestInitLLMProvider_OpenAI(t *testing.T) {
 	// Test the "openai" branch.
 	os.Setenv("OPENAI_API_KEY", "dummy-key")
 	defer os.Unsetenv("OPENAI_API_KEY")
-	cfg := Config{
+	cfg := llmConfig.Config{
 		Provider: "openai",
-		Model: ModelConfig{
+		Model: llmConfig.ModelConfig{
 			Name: "gpt-4",
 		},
 	}
@@ -44,9 +46,9 @@ func TestInitLLMProvider_OpenAI(t *testing.T) {
 
 func TestInitLLMProvider_Unsupported(t *testing.T) {
 	// Test the unsupported provider branch.
-	cfg := Config{
+	cfg := llmConfig.Config{
 		Provider: "unknown",
-		Model: ModelConfig{
+		Model: llmConfig.ModelConfig{
 			Name: "dummy",
 		},
 	}

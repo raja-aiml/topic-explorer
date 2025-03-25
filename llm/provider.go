@@ -6,10 +6,12 @@ import (
 	"github.com/tmc/langchaingo/llms"
 	"github.com/tmc/langchaingo/llms/ollama"
 	"github.com/tmc/langchaingo/llms/openai"
+
+	llmConfig "raja.aiml/ai.explorer/config/llm"
 )
 
 // initLLMProvider initializes the LLM provider based on configuration.
-func initLLMProvider(config Config) (llms.Model, error) {
+func initLLMProvider(config llmConfig.Config) (llms.Model, error) {
 	switch config.Provider {
 	case "ollama":
 		return ollama.New(ollama.WithModel(config.Model.Name))
