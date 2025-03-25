@@ -7,11 +7,12 @@ import (
 	"testing"
 )
 
-const testTemplate = `template: |
+const (
+	topicTemplateYAML = `template: |
   Hello, {{ audience }}!
   You are learning about {{ topic }} in a {{ tone }} way.`
 
-const testConfig = `
+	topicConfigYAML = `
 audience: "Test Audience"
 learning_stage: "beginner"
 topic: "Generics"
@@ -26,43 +27,43 @@ purpose: "learn Go generics"
 tone: "friendly"
 `
 
-var expectedText = `Hello, Test Audience!
+	expectedOutput = `Hello, Test Audience!
 You are learning about Generics in a friendly way.`
+)
 
-func TestBuildPromptCorrectly(t *testing.T) {
+func TestBuildTopicPrompt(t *testing.T) {
 	dir := t.TempDir()
 
-	templatePath := filepath.Join(dir, "template.yaml")
-	configPath := filepath.Join(dir, "config.yaml")
-	outputPath := filepath.Join(dir, "output.txt")
+	tplPath := filepath.Join(dir, "template.yaml")
+	cfgPath := filepath.Join(dir, "config.yaml")
+	outPath := filepath.Join(dir, "output.txt")
 
-	writeFile(t, templatePath, testTemplate)
-	writeFile(t, configPath, testConfig)
+	writeFile(t, tplPath, topicTemplateYAML)
+	writeFile(t, cfgPath, topicConfigYAML)
 
-	Build(templatePath, configPath, outputPath)
+	BuildTopicPrompt(tplPath, cfgPath, outPath)
 
-	got := readFile(t, outputPath)
-	want := expectedText
+	got := readFile(t, outPath)
 
-	if strings.TrimSpace(got) != want {
-		t.Errorf("\nExpected:\n%q\nGot:\n%q", want, got)
+	if strings.TrimSpace(got) != expectedOutput {
+		t.Errorf("\nExpected:\n%q\nGot:\n%q", expectedOutput, got)
 	}
 }
 
-// writeFile writes string content to a file path.
+// Helpers
+
 func writeFile(t *testing.T, path, content string) {
 	t.Helper()
 	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
-		t.Fatalf("writeFile failed for %s: %v", path, err)
+		t.Fatalf("writeFile failed: %v", err)
 	}
 }
 
-// readFile reads file content as string.
 func readFile(t *testing.T, path string) string {
 	t.Helper()
 	data, err := os.ReadFile(path)
 	if err != nil {
-		t.Fatalf("readFile failed for %s: %v", path, err)
+		t.Fatalf("readFile failed: %v", err)
 	}
 	return string(data)
 }
