@@ -18,6 +18,15 @@ func NewSimilarityService(embedder wrapper.Embedder) *SimilarityService {
 	return &SimilarityService{embedder: embedder}
 }
 
+// GetEmbeddings returns the embeddings for a slice of input strings.
+// It is useful for retrieving raw vector representations for downstream tasks like storage or clustering.
+func (s *SimilarityService) GetEmbeddings(ctx context.Context, inputs []string) ([][]float32, error) {
+	if len(inputs) == 0 {
+		return nil, errors.New("input list is empty")
+	}
+	return s.embedder.Embed(ctx, inputs)
+}
+
 // Compare computes cosine similarity between the embeddings of two input strings.
 func (s *SimilarityService) Compare(ctx context.Context, a, b string) (float64, error) {
 	vecs, err := s.embedder.Embed(ctx, []string{a, b})
