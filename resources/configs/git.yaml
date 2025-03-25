@@ -1,5 +1,5 @@
 audience: "New college students"
-learning_stage: " first-time"
+learning_stage: "first-time"
 topic: "Git"
 context: "student"
 analogies: "road trip planning with friends and writing a group project collaboration"
@@ -14,7 +14,7 @@ concepts:
   - "**GitHub**: How it facilitates collaboration and backup"
 
 explanation_requirements:
-  - "Start with a brief overview comparing Git to the choose analogy"
+  - "Start with a brief overview comparing Git to the chosen analogy"
   - "Use concrete, relatable examples from the analogy to explain Git concepts"
   - "Explain why Git is more powerful than simple file storage (like Google Drive)"
   - "Include common Git commands with their analogy equivalents"
