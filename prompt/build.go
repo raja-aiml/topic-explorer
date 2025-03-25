@@ -34,6 +34,26 @@ func BuildTopicPrompt(templateFile, configFile, outputFile string) {
 	renderAndSave(tpl.Template, ctx, outputFile)
 }
 
+func BuildChartPrompt(templateFile, configFile, outputFile string) {
+	log.Printf("[chart] Loading template: %s", templateFile)
+	tpl := mustReadTemplate(templateFile)
+
+	log.Printf("[chart] Loading config: %s", configFile)
+	cfg := mustReadChartConfig(configFile)
+
+	ctx := pongo2.Context{
+		"flow_direction":  cfg.FlowDirection,
+		"style":           cfg.Style,
+		"planning_phase":  cfg.PlanningPhase,
+		"planning_links":  cfg.PlanningLinks,
+		"execution_phase": cfg.ExecutionPhase,
+		"execution_links": cfg.ExecutionLinks,
+		"transition_link": cfg.TransitionLink,
+	}
+
+	renderAndSave(tpl.Template, ctx, outputFile)
+}
+
 // -------------------- Internal Helpers --------------------
 
 func mustReadTemplate(path string) promptConfig.Template {
@@ -48,6 +68,14 @@ func mustReadTopicConfig(path string) promptConfig.TopicConfig {
 	cfg, err := promptConfig.ReadTopicConfig(path)
 	if err != nil {
 		log.Fatalf("Error reading topic config: %v", err)
+	}
+	return cfg
+}
+
+func mustReadChartConfig(path string) promptConfig.ChartConfig {
+	cfg, err := promptConfig.ReadChartConfig(path)
+	if err != nil {
+		log.Fatalf("Error reading chart config: %v", err)
 	}
 	return cfg
 }
