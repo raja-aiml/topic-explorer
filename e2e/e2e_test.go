@@ -10,18 +10,19 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-// --- Configurable Constants ---
+// --- Constants ---
 const (
-	binaryName      = "ai-explorer"
-	topic           = "git"
-	openai_model    = "gpt-4o"
-	ollama_model    = "phi4"
-	openai_provider = "openai"
-	ollama_provider = "ollama"
-	temperature     = "0.7"
+	binaryName     = "ai-explorer"
+	topic          = "git"
+	openaiModel    = "gpt-4o"
+	ollamaModel    = "phi4"
+	openaiProvider = "openai"
+	ollamaProvider = "ollama"
+	temperature    = "0.7"
+	rootDir        = ".."
 )
 
-// --- Paths Struct ---
+// --- Paths ---
 type TestPaths struct {
 	RootDir      string
 	BinPath      string
@@ -31,13 +32,11 @@ type TestPaths struct {
 	PromptOutput string
 }
 
-// --- Path Resolver ---
-func newTestPaths(topic string, suffix string) *TestPaths {
-	root := ".."
-	output := filepath.Join(root, ".build", "output", "test_"+topic+"_"+suffix)
+func newTestPaths(topic, suffix string) *TestPaths {
+	output := filepath.Join(".build", "output", "test_"+topic+"_"+suffix)
 
 	return &TestPaths{
-		RootDir:      root,
+		RootDir:      rootDir,
 		BinPath:      filepath.Join(".build", binaryName),
 		TemplatePath: filepath.Join("resources", "template.yaml"),
 		ConfigPath:   filepath.Join("resources", "configs", topic+".yaml"),
@@ -46,140 +45,108 @@ func newTestPaths(topic string, suffix string) *TestPaths {
 	}
 }
 
-// --- Command Executor ---
+// --- Utilities ---
 func runCommand(paths *TestPaths, args ...string) ([]byte, error) {
+	GinkgoWriter.Println("Running command:", paths.BinPath, args)
 	cmd := exec.Command(paths.BinPath, args...)
-	cmd.Dir = paths.RootDir // run from project root
-	cmd.Env = os.Environ()  // inherit .env-loaded vars
-	return cmd.CombinedOutput()
+	cmd.Dir = paths.RootDir
+	cmd.Env = os.Environ()
+
+	output, err := cmd.CombinedOutput()
+	return output, err
 }
 
+func createOutputDir(paths *TestPaths) {
+	err := os.MkdirAll(paths.OutputDir, os.ModePerm)
+	GinkgoWriter.Printf("Created Direcrtory:\n%s\n", string(paths.OutputDir))
+	Expect(err).ToNot(HaveOccurred(), "Failed to create output directory")
+}
+
+func generatePrompt(paths *TestPaths) {
+	output, err := runCommand(paths,
+		"prompt",
+		"--topic", topic,
+		"--template", paths.TemplatePath,
+		"--config", paths.ConfigPath,
+		"--output", paths.PromptOutput,
+	)
+	Expect(err).ToNot(HaveOccurred(), "Prompt generation command failed")
+	GinkgoWriter.Printf("Prompt generation output:\n%s\n", string(output))
+
+	fullPromptPath := filepath.Join(paths.RootDir, paths.PromptOutput)
+	Expect(fullPromptPath).To(BeAnExistingFile(),
+		"Expected prompt output file to exist at: %s", fullPromptPath)
+}
+
+func runLLMCommand(paths *TestPaths, provider, model string) {
+	output, err := runCommand(paths,
+		"llm",
+		"--provider", provider,
+		"--model", model,
+		"--prompt", paths.PromptOutput,
+		"--temperature", temperature,
+	)
+	Expect(err).ToNot(HaveOccurred(), "LLM command failed:\n%s", string(output))
+	Expect(string(output)).To(ContainSubstring(topic))
+}
+
+func runChatCommand(paths *TestPaths, provider, model string) {
+	output, err := runCommand(paths,
+		"chat",
+		"--topic", topic,
+		"--provider", provider,
+		"--model", model,
+	)
+	Expect(err).ToNot(HaveOccurred(), "Chat command failed:\n%s", string(output))
+	Expect(string(output)).To(ContainSubstring(topic))
+}
+
+// --- Test Runner ---
 func TestAIExplorerCLI(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "AI Explorer CLI E2E Suite")
 }
 
+// --- Test Specs ---
 var _ = Describe("AI Explorer CLI (E2E)", func() {
-	// Parallelize the entire describe block
 	GinkgoParallelProcess()
+	defer GinkgoRecover()
 
-	// Prompt Generation Test
 	Describe("Prompt Generation", func() {
 		It("Should generate a prompt file", func() {
 			paths := newTestPaths(topic, "prompt")
-			err := os.MkdirAll(paths.OutputDir, os.ModePerm)
-			Expect(err).ToNot(HaveOccurred(), "Failed to create output directory")
-
-			output, err := runCommand(paths,
-				"prompt",
-				"--topic", topic,
-				"--template", paths.TemplatePath,
-				"--config", paths.ConfigPath,
-				"--output", paths.PromptOutput,
-			)
-
-			Expect(err).ToNot(HaveOccurred(), "Prompt generation failed:\n%s", string(output))
-			Expect(paths.PromptOutput).To(BeAnExistingFile(), "Prompt file should exist")
+			createOutputDir(paths)
+			generatePrompt(paths)
 		})
 	})
 
-	// LLM Command Tests
 	Describe("LLM Commands", func() {
-		// OpenAI LLM Test
 		It("Should return a valid OpenAI model response", func() {
 			paths := newTestPaths(topic, "openai_llm")
-			err := os.MkdirAll(paths.OutputDir, os.ModePerm)
-			Expect(err).ToNot(HaveOccurred(), "Failed to create output directory")
-
-			// First generate a prompt
-			promptOutput := filepath.Join(paths.OutputDir, "prompt.txt")
-			output, err := runCommand(paths,
-				"prompt",
-				"--topic", topic,
-				"--template", paths.TemplatePath,
-				"--config", paths.ConfigPath,
-				"--output", promptOutput,
-			)
-			Expect(err).ToNot(HaveOccurred(), "Prompt generation failed:\n%s", string(output))
-
-			// Then run LLM command
-			output, err = runCommand(paths,
-				"llm",
-				"--provider", openai_provider,
-				"--model", openai_model,
-				"--prompt", promptOutput,
-				"--temperature", temperature,
-			)
-
-			Expect(err).ToNot(HaveOccurred(), "LLM command failed:\n%s", string(output))
-			Expect(string(output)).To(ContainSubstring(topic))
+			createOutputDir(paths)
+			generatePrompt(paths)
+			runLLMCommand(paths, openaiProvider, openaiModel)
 		})
 
-		// Ollama LLM Test
 		It("Should return a valid Ollama model response", func() {
 			paths := newTestPaths(topic, "ollama_llm")
-			err := os.MkdirAll(paths.OutputDir, os.ModePerm)
-			Expect(err).ToNot(HaveOccurred(), "Failed to create output directory")
-
-			// First generate a prompt
-			promptOutput := filepath.Join(paths.OutputDir, "prompt.txt")
-			output, err := runCommand(paths,
-				"prompt",
-				"--topic", topic,
-				"--template", paths.TemplatePath,
-				"--config", paths.ConfigPath,
-				"--output", promptOutput,
-			)
-			Expect(err).ToNot(HaveOccurred(), "Prompt generation failed:\n%s", string(output))
-
-			// Then run LLM command
-			output, err = runCommand(paths,
-				"llm",
-				"--provider", ollama_provider,
-				"--model", ollama_model,
-				"--prompt", promptOutput,
-				"--temperature", temperature,
-			)
-
-			Expect(err).ToNot(HaveOccurred(), "LLM command failed:\n%s", string(output))
-			Expect(string(output)).To(ContainSubstring(topic))
+			createOutputDir(paths)
+			generatePrompt(paths)
+			runLLMCommand(paths, ollamaProvider, ollamaModel)
 		})
 	})
 
-	// Chat Command Tests
 	Describe("Chat Commands", func() {
-		// OpenAI Chat Test
 		It("Should generate a prompt and get an OpenAI response", func() {
 			paths := newTestPaths(topic, "openai_chat")
-			err := os.MkdirAll(paths.OutputDir, os.ModePerm)
-			Expect(err).ToNot(HaveOccurred(), "Failed to create output directory")
-
-			output, err := runCommand(paths,
-				"chat",
-				"--topic", topic,
-				"--provider", openai_provider,
-				"--model", openai_model,
-			)
-
-			Expect(err).ToNot(HaveOccurred(), "Chat command failed:\n%s", string(output))
-			Expect(string(output)).To(ContainSubstring(topic))
+			createOutputDir(paths)
+			runChatCommand(paths, openaiProvider, openaiModel)
 		})
 
-		// Ollama Chat Test
 		It("Should generate a prompt and get an Ollama response", func() {
 			paths := newTestPaths(topic, "ollama_chat")
-			err := os.MkdirAll(paths.OutputDir, os.ModePerm)
-			Expect(err).ToNot(HaveOccurred(), "Failed to create output directory")
-
-			output, err := runCommand(paths,
-				"chat",
-				"--topic", topic,
-				"--provider", ollama_provider,
-				"--model", ollama_model,
-			)
-
-			Expect(err).ToNot(HaveOccurred(), "Chat command failed:\n%s", string(output))
-			Expect(string(output)).To(ContainSubstring(topic))
+			createOutputDir(paths)
+			runChatCommand(paths, ollamaProvider, ollamaModel)
 		})
 	})
 })
