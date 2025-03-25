@@ -3,6 +3,7 @@ module raja.aiml/ai.explorer
 go 1.24.1
 
 require (
+	github.com/flosch/pongo2/v6 v6.0.0
 	github.com/joho/godotenv v1.5.1
 	github.com/onsi/ginkgo/v2 v2.23.3
 	github.com/onsi/gomega v1.36.3
