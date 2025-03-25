@@ -31,7 +31,7 @@ type TestPaths struct {
 // --- Path Resolver ---
 func newTestPaths(topic string) *TestPaths {
 	root := ".."
-	output := filepath.Join(root, ".build", "output", "test_"+topic)
+	output := filepath.Join(".build", "output", "test_"+topic)
 
 	return &TestPaths{
 		RootDir:      root,
@@ -93,6 +93,7 @@ var _ = Describe("AI Explorer CLI (E2E)", func() {
 
 		When("the user runs the 'chat' command", func() {
 			It("Then it should generate a prompt and get a response in one step", func() {
+				Skip("skip calling llm")
 				output, err := runCommand(paths,
 					"chat",
 					"--topic", topic,
