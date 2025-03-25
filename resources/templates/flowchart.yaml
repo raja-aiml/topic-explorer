@@ -1,31 +1,30 @@
 template: |
   flowchart {{ flow_direction }}
+      %% {{ planning_phase.title }} (left column, vertical flow)
+      subgraph Planning [{{ planning_phase.emoji }} {{ planning_phase.title }}]
+          direction {{ planning_phase.direction }}
+          {% for step in planning_phase.steps %}
+          {{ step.id }}([{{ step.emoji }} {{ step.title }}<br><sub>{{ step.description }}</sub>])
+          {% endfor %}
+          {% for link in planning_links %}
+          {{ link.from }} --> {{ link.to }}
+          {% endfor %}
+      end
 
-  %% {{ planning_phase.title }} (left column, vertical flow)
-  subgraph Planning [{{ planning_phase.emoji }} {{ planning_phase.title }}]
-    direction {{ planning_phase.direction }}
-  {% for step in planning_phase.steps %}
-    {{ step.id }}([{{ step.emoji }} {{ step.title }}<br><sub>{{ step.description }}</sub>])
-  {% endfor %}
-  {% for link in planning_links %}
-    {{ link.from }} --> {{ link.to }}
-  {% endfor %}
-  end
+      %% {{ execution_phase.title }} (right column, vertical flow)
+      subgraph Execution [{{ execution_phase.emoji }} {{ execution_phase.title }}]
+          direction {{ execution_phase.direction }}
+          {% for step in execution_phase.steps %}
+          {{ step.id }}([{{ step.emoji }} {{ step.title }}<br><sub>{{ step.description }}</sub>])
+          {% endfor %}
+          {% for link in execution_links %}
+          {{ link.from }} --> {{ link.to }}
+          {% endfor %}
+      end
 
-  %% {{ execution_phase.title }} (right column, vertical flow)
-  subgraph Execution [{{ execution_phase.emoji }} {{ execution_phase.title }}]
-    direction {{ execution_phase.direction }}
-  {% for step in execution_phase.steps %}
-    {{ step.id }}([{{ step.emoji }} {{ step.title }}<br><sub>{{ step.description }}</sub>])
-  {% endfor %}
-  {% for link in execution_links %}
-    {{ link.from }} --> {{ link.to }}
-  {% endfor %}
-  end
+      %% Connect end of Planning to start of Execution
+      {{ transition_link.from }} --> {{ transition_link.to }}
 
-  %% Connect end of Planning to start of Execution
-  {{ transition_link.from }} --> {{ transition_link.to }}
-
-  %% Apply shared style to all nodes
-  class {% for step in planning_phase.steps + execution_phase.steps %}{{ step.id }}{% if not loop.last %},{% endif %}{% endfor %} subtaskBox
-  classDef subtaskBox {{ style.subtaskBox }};
+      %% Apply shared style to all nodes
+      class {% for step in all_steps %}{{ step.id }}{% if not loop.last %},{% endif %}{% endfor %} subtaskBox
+      classDef subtaskBox {{ style.subtaskBox }};
