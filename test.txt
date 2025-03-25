@@ -1,0 +1,30 @@
+flowchart LR
+
+%%  (left column, vertical flow)
+subgraph Planning [ ]
+  direction 
+
+
+   --> 
+
+   --> 
+
+   --> 
+
+end
+
+%%  (right column, vertical flow)
+subgraph Execution [ ]
+  direction 
+
+
+   --> 
+
+   --> 
+
+end
+
+ --> 
+
+class  subtaskBox
+classDef subtaskBox ;

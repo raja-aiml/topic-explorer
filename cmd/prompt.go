@@ -42,8 +42,6 @@ func init() {
 // buildPrompt determines type from config and dispatches the right generator
 func buildPrompt(tmpl, cfg, out string) string {
 	switch detectPromptType(cfg) {
-	case "chart":
-		prompt.BuildChartPrompt(tmpl, cfg, out)
 	case "topic":
 		prompt.BuildTopicPrompt(tmpl, cfg, out)
 	default:
@@ -65,8 +63,6 @@ func detectPromptType(configPath string) string {
 	}
 
 	switch {
-	case hasKey(raw, "planning_phase"):
-		return "chart"
 	case hasKey(raw, "audience"):
 		return "topic"
 	default:

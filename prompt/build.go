@@ -16,8 +16,6 @@ func BuildTopicPrompt(templateFile, configFile, outputFile string) {
 	log.Printf("[topic] Loading config: %s", configFile)
 	cfg := mustReadTopicConfig(configFile)
 
-	log.Printf("[topic] Rendering context: %+v", cfg)
-
 	ctx := pongo2.Context{
 		"audience":                 cfg.Audience,
 		"learning_stage":           cfg.LearningStage,
@@ -31,45 +29,6 @@ func BuildTopicPrompt(templateFile, configFile, outputFile string) {
 		"output_format":            cfg.OutputFormat,
 		"purpose":                  cfg.Purpose,
 		"tone":                     cfg.Tone,
-	}
-
-	renderAndSave(tpl.Template, ctx, outputFile)
-}
-
-func BuildChartPrompt(templateFile, configFile, outputFile string) {
-	log.Printf("[chart] Loading template: %s", templateFile)
-	tpl := mustReadTemplate(templateFile)
-
-	log.Printf("[chart] Loading config: %s", configFile)
-	cfg := mustReadChartConfig(configFile)
-
-	log.Println("[chart] Generating links...")
-	cfg.PlanningLinks = cfg.GenerateLinks(cfg.PlanningPhase.Steps)
-	cfg.ExecutionLinks = cfg.GenerateLinks(cfg.ExecutionPhase.Steps)
-
-	if len(cfg.PlanningPhase.Steps) > 0 && len(cfg.ExecutionPhase.Steps) > 0 {
-		cfg.TransitionLink = promptConfig.Transition{
-			From: cfg.PlanningPhase.Steps[len(cfg.PlanningPhase.Steps)-1].ID,
-			To:   cfg.ExecutionPhase.Steps[0].ID,
-		}
-	}
-
-	log.Printf("[chart] Rendering context:\n  Flow: %s\n  Planning Steps: %d\n  Execution Steps: %d\n  Transition: %s -> %s\n",
-		cfg.FlowDirection,
-		len(cfg.PlanningPhase.Steps),
-		len(cfg.ExecutionPhase.Steps),
-		cfg.TransitionLink.From,
-		cfg.TransitionLink.To,
-	)
-
-	ctx := pongo2.Context{
-		"flow_direction":  cfg.FlowDirection,
-		"planning_phase":  cfg.PlanningPhase,
-		"execution_phase": cfg.ExecutionPhase,
-		"planning_links":  cfg.PlanningLinks,
-		"execution_links": cfg.ExecutionLinks,
-		"transition_link": cfg.TransitionLink,
-		"style":           cfg.Style,
 	}
 
 	renderAndSave(tpl.Template, ctx, outputFile)
@@ -93,14 +52,6 @@ func mustReadTopicConfig(path string) promptConfig.TopicConfig {
 	return cfg
 }
 
-func mustReadChartConfig(path string) promptConfig.ChartConfig {
-	cfg, err := promptConfig.ReadChartConfig(path)
-	if err != nil {
-		log.Fatalf("Error reading chart config: %v", err)
-	}
-	return cfg
-}
-
 func renderAndSave(tplStr string, ctx pongo2.Context, outputPath string) {
 	log.Println("[render] Parsing template...")
 	tpl, err := pongo2.FromString(tplStr)
@@ -113,9 +64,6 @@ func renderAndSave(tplStr string, ctx pongo2.Context, outputPath string) {
 	if err != nil {
 		log.Fatalf("Error rendering template: %v", err)
 	}
-
-	log.Println(tpl)
-	log.Println(output)
 
 	writePrompt(outputPath, output)
 }
