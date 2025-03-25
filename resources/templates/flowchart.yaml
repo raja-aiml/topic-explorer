@@ -1,0 +1,31 @@
+template: |
+  flowchart {{flow_direction}}
+
+  %% {{planning_phase.title}} (left column, vertical flow)
+  subgraph Planning [{{planning_phase.emoji}} {{planning_phase.title}}]
+      direction {{planning_phase.direction}}
+  {% for step in planning_phase.steps %}
+      {{step.id}}([{{step.emoji}} {{step.title}}<br><sub>{{step.description}}</sub>])
+  {% endfor %}
+  {% for i in range(planning_phase.steps | length - 1) %}
+      {{planning_phase.steps[i].id}} --> {{planning_phase.steps[i + 1].id}}
+  {% endfor %}
+  end
+
+  %% {{execution_phase.title}} (right column, vertical flow)
+  subgraph Execution [{{execution_phase.emoji}} {{execution_phase.title}}]
+      direction {{execution_phase.direction}}
+  {% for step in execution_phase.steps %}
+      {{step.id}}([{{step.emoji}} {{step.title}}<br><sub>{{step.description}}</sub>])
+  {% endfor %}
+  {% for i in range(execution_phase.steps | length - 1) %}
+      {{execution_phase.steps[i].id}} --> {{execution_phase.steps[i + 1].id}}
+  {% endfor %}
+  end
+
+  %% Connect end of planning to start of execution
+  {{planning_phase.steps[-1].id}} --> {{execution_phase.steps[0].id}}
+
+  %% Apply shared style to all nodes
+  class {% for step in planning_phase.steps + execution_phase.steps %}{{step.id}}{% if not loop.last %},{% endif %}{% endfor %} subtaskBox
+  classDef subtaskBox {{style.subtaskBox}};
