@@ -7,9 +7,25 @@ tasks:
       - echo "Available tasks:"
       - echo "  default  - Show this help message"
       - echo "  coverage - Run tests with coverage and generate an HTML report"
+      - echo "  tools    - Install Ginkgo CLI"
+
+  e2e:
+    desc: "Build and run Ginkgo-based end-to-end tests"
+    cmds:
+      - go build -o .build/ai-explorer main.go
+      - ginkgo -v e2e
 
   coverage:
     desc: "Run tests with coverage and generate an HTML report"
     cmds:
+      - mkdir -p .build
       - go test ./... -coverprofile=.build/coverage.out
       - go tool cover -html=.build/coverage.out -o .build/coverage.html
+
+
+
+  tools:
+    desc: "Install Ginkgo CLI tool"
+    cmds:
+      - go install github.com/onsi/ginkgo/v2/ginkgo@latest
+      - go get github.com/onsi/gomega/...
