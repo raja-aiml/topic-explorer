@@ -3,21 +3,16 @@ package llm
 import (
 	"fmt"
 
-	"github.com/tmc/langchaingo/llms"
-	"github.com/tmc/langchaingo/llms/ollama"
-	"github.com/tmc/langchaingo/llms/openai"
-
-	llmConfig "raja.aiml/ai.explorer/config/llm"
+	"raja.aiml/ai.explorer/config/llm"
+	langchainWrapper "raja.aiml/ai.explorer/llm/wrapper"
 )
 
-// initLLMProvider initializes the LLM provider based on configuration.
-func initLLMProvider(config llmConfig.Config) (llms.Model, error) {
-	switch config.Provider {
-	case "ollama":
-		return ollama.New(ollama.WithModel(config.Model.Name))
-	case "openai":
-		return openai.New(openai.WithModel(config.Model.Name))
-	default:
-		return nil, fmt.Errorf("unsupported LLM provider: %s", config.Provider)
+// initLLMProvider initializes the LLM model using the langchaingo wrapper.
+func InitLLMProvider(cfg llm.Config) (langchainWrapper.Model, error) {
+	provider := &langchainWrapper.LangchaingoProvider{}
+	model, err := provider.Init(cfg.Provider, cfg.Model.Name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize LLM provider: %w", err)
 	}
+	return model, nil
 }

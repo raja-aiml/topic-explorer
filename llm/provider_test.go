@@ -1,7 +1,7 @@
 package llm
 
 import (
-	"fmt"
+	"errors"
 	"os"
 	"testing"
 
@@ -16,7 +16,7 @@ func TestInitLLMProvider_Ollama(t *testing.T) {
 			Name: "phi4",
 		},
 	}
-	model, err := initLLMProvider(cfg)
+	model, err := InitLLMProvider(cfg)
 	if err != nil {
 		t.Fatalf("Expected no error for provider 'ollama', got: %v", err)
 	}
@@ -35,7 +35,7 @@ func TestInitLLMProvider_OpenAI(t *testing.T) {
 			Name: "gpt-4",
 		},
 	}
-	model, err := initLLMProvider(cfg)
+	model, err := InitLLMProvider(cfg)
 	if err != nil {
 		t.Fatalf("Expected no error for provider 'openai', got: %v", err)
 	}
@@ -45,22 +45,41 @@ func TestInitLLMProvider_OpenAI(t *testing.T) {
 }
 
 func TestInitLLMProvider_Unsupported(t *testing.T) {
-	// Test the unsupported provider branch.
 	cfg := llmConfig.Config{
 		Provider: "unknown",
 		Model: llmConfig.ModelConfig{
 			Name: "dummy",
 		},
 	}
-	model, err := initLLMProvider(cfg)
+	model, err := InitLLMProvider(cfg)
+
 	if err == nil {
 		t.Fatal("Expected error for unsupported provider, got nil")
 	}
 	if model != nil {
 		t.Fatalf("Expected nil model for unsupported provider, got: %v", model)
 	}
-	expected := fmt.Sprintf("unsupported LLM provider: %s", cfg.Provider)
-	if err.Error() != expected {
-		t.Fatalf("Expected error message %q, got %q", expected, err.Error())
+
+	// Use errors.As to extract the custom error type if needed,
+	// or just check for substring
+	expected := "unsupported LLM provider: unknown"
+	if err.Error() != expected && !containsError(err, expected) {
+		t.Fatalf("Expected error to contain %q, got %q", expected, err.Error())
 	}
+}
+
+// containsError is a helper that recursively unwraps errors
+// and checks if the message contains the expected string.
+func containsError(err error, expected string) bool {
+	for err != nil {
+		if err.Error() == expected {
+			return true
+		}
+		unwrapped := errors.Unwrap(err)
+		if unwrapped == nil {
+			break
+		}
+		err = unwrapped
+	}
+	return false
 }

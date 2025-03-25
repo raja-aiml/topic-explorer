@@ -5,23 +5,22 @@ import (
 	"errors"
 	"math"
 
-	"github.com/tmc/langchaingo/embeddings"
-	"github.com/tmc/langchaingo/llms/openai"
+	"raja.aiml/ai.explorer/llm/wrapper"
 )
 
 // SimilarityService computes cosine similarity using an Embedder.
 type SimilarityService struct {
-	embedder embeddings.Embedder
+	embedder wrapper.Embedder
 }
 
-// NewSimilarityService returns a service with a langchaingo-compatible Embedder.
-func NewSimilarityService(embedder embeddings.Embedder) *SimilarityService {
+// NewSimilarityService constructs a similarity service using the provided Embedder.
+func NewSimilarityService(embedder wrapper.Embedder) *SimilarityService {
 	return &SimilarityService{embedder: embedder}
 }
 
-// Compare returns the cosine similarity between two input strings.
+// Compare computes cosine similarity between the embeddings of two input strings.
 func (s *SimilarityService) Compare(ctx context.Context, a, b string) (float64, error) {
-	vecs, err := s.embedder.EmbedDocuments(ctx, []string{a, b})
+	vecs, err := s.embedder.Embed(ctx, []string{a, b})
 	if err != nil {
 		return 0, err
 	}
@@ -31,7 +30,7 @@ func (s *SimilarityService) Compare(ctx context.Context, a, b string) (float64, 
 	return cosine(vecs[0], vecs[1]), nil
 }
 
-// cosine computes cosine similarity between two float32 vectors.
+// cosine calculates cosine similarity between two vectors.
 func cosine(a, b []float32) float64 {
 	if len(a) != len(b) {
 		return 0
@@ -46,13 +45,4 @@ func cosine(a, b []float32) float64 {
 		return 0
 	}
 	return dot / (math.Sqrt(normA) * math.Sqrt(normB))
-}
-
-// NewOpenAIEmbedder uses langchaingo's default .env-based API key loading.
-func NewOpenAIEmbedder() (embeddings.Embedder, error) {
-	llm, err := openai.New() // auto-loads OPENAI_API_KEY from env
-	if err != nil {
-		return nil, err
-	}
-	return embeddings.NewEmbedder(llm)
 }
