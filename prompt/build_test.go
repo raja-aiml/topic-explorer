@@ -9,7 +9,7 @@ import (
 	"sync"
 	"testing"
 
-	"raja.aiml/ai.explorer/config"
+	promptConfig "raja.aiml/ai.explorer/config/prompt"
 	"raja.aiml/ai.explorer/paths"
 )
 
@@ -18,7 +18,7 @@ func TestGeneratePrompt(t *testing.T) {
 	// Fake template string with placeholders.
 	templateStr := "Welcome, {audience}. You are learning about {topic} in a {tone} way."
 	// Create a fake config with dummy data.
-	fakeConfig := config.Config{
+	fakeConfig := promptConfig.Config{
 		Audience:                "Test Audience",
 		LearningStage:           "beginner",
 		Topic:                   "Dependency Injection",
@@ -165,7 +165,7 @@ tone: "serious"
 // TestGetReplacements calls getReplacements and checks that the expected keys and formatted values are returned.
 func TestGetReplacements(t *testing.T) {
 	// Create a fake config with sample data.
-	fakeConfig := config.Config{
+	fakeConfig := promptConfig.Config{
 		Audience:                "Test Audience",
 		LearningStage:           "advanced",
 		Topic:                   "Generics",
@@ -278,12 +278,12 @@ tone: "calm"
 func TestReflectionFallback(t *testing.T) {
 	// Define a wrapper type that embeds config.Config and adds an integer field.
 	type dummyConfig struct {
-		config.Config
+		promptConfig.Config
 		Extra int `yaml:"extra"`
 	}
 	// Create an instance with non-string value.
 	dc := dummyConfig{
-		Config: config.Config{
+		Config: promptConfig.Config{
 			Audience: "Test Audience",
 			// other fields can be left empty
 		},

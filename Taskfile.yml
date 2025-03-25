@@ -5,13 +5,22 @@ tasks:
     desc: "Display help information"
     cmds:
       - echo "Available tasks:"
-      - echo "  default  - Show this help message"
-      - echo "  coverage - Run tests with coverage and generate an HTML report"
-      - echo "  tools    - Install Ginkgo CLI"
+      - echo "  default    - Show this help message"
+      - echo "  unit       - Run only unit tests (exclude e2e)"
+      - echo "  coverage   - Run tests with coverage and generate an HTML report"
+      - echo "  e2e        - Run Ginkgo-based end-to-end tests"
+      - echo "  tools      - Install Ginkgo CLI"
+
+  unit:
+    desc: "Run only unit tests (excluding e2e)"
+    cmds:
+      - |
+        go test $(go list ./... | grep -v '/e2e$')
 
   e2e:
     desc: "Build and run Ginkgo-based end-to-end tests"
     cmds:
+      - mkdir -p .build
       - go build -o .build/ai-explorer main.go
       - ginkgo -v e2e
 
@@ -19,10 +28,8 @@ tasks:
     desc: "Run tests with coverage and generate an HTML report"
     cmds:
       - mkdir -p .build
-      - go test ./... -coverprofile=.build/coverage.out
+      - go test $(go list ./... | grep -v '/e2e$') -coverprofile=.build/coverage.out
       - go tool cover -html=.build/coverage.out -o .build/coverage.html
-
-
 
   tools:
     desc: "Install Ginkgo CLI tool"
